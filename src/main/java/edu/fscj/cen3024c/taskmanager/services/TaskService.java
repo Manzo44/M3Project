@@ -1,42 +1,43 @@
+// TaskService.java
+// Cristian Manzo
+// September 20, 2026
+// Service layer that reads and writes tasks through the database
+
 package edu.fscj.cen3024c.taskmanager.services;
 
 import edu.fscj.cen3024c.taskmanager.entities.Task;
 import edu.fscj.cen3024c.taskmanager.exceptions.TaskNotFoundException;
+import edu.fscj.cen3024c.taskmanager.repositories.TaskRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class TaskService {
-    private final Map<Integer, Task> taskMap = new HashMap<>();
-    private int currentId = 1;
 
+    // Spring builds the repository at startup and hands it to us here
+    @Autowired
+    private TaskRepository taskRepository;
+
+    // Returning every row in the task table
     public List<Task> findAll() {
-        return new ArrayList<>(taskMap.values());
+        return taskRepository.findAll();
     }
 
+    // Looking up one task, throwing a 404 exception when the id is not in the table
     public Task findById(Integer id) {
-        if (!taskMap.containsKey(id)) {
-            throw new TaskNotFoundException(id);
-        }
-        return taskMap.get(id);
+        return taskRepository.findById(id)
+                .orElseThrow(() -> new TaskNotFoundException(id));
     }
 
+    // Saving a new task or updating an existing one, the database assigns the id
     public Task save(Task task) {
-        if (task.getId() == null) {
-            task.setId(currentId++);
-        }
-        taskMap.put(task.getId(), task);
-        return task;
+        return taskRepository.save(task);
     }
 
+    // Removing a task by id
     public void deleteById(Integer id) {
-        if (!taskMap.containsKey(id)) {
-            throw new TaskNotFoundException(id);
-        }
-        taskMap.remove(id);
+        taskRepository.deleteById(id);
     }
 }

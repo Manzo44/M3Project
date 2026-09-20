@@ -1,18 +1,42 @@
+// Task.java
+// Cristian Manzo
+// September 20, 2026
+// Entity class that maps the task table into Java
+
 package edu.fscj.cen3024c.taskmanager.entities;
 
-public class Task {
-    private Integer id;
-    private String title;
-    private String description;
-    private String status; // PENDING, IN_PROGRESS, COMPLETED
-    private String dueDate; // YYYY-MM-DD
+import jakarta.persistence.*;
 
-    public Task(String title, String description, String status, String dueDate){
-        this.title = title;
-        this.description = description;
-        this.status = status;
-        this.dueDate = dueDate;
-    }
+import java.time.LocalDate;
+
+// @Entity marks this class as a database table, @Table names which one
+@Entity
+@Table(name = "task")
+public class Task {
+
+    // Primary key, assigned by PostgreSQL rather than by our code
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
+    private Integer id;
+
+    // Required field, matches the not null title column
+    @Column(name = "title", nullable = false, length = Integer.MAX_VALUE)
+    private String title;
+
+    // Optional field, the column allows nulls
+    @Column(name = "description", length = Integer.MAX_VALUE)
+    private String description;
+
+    // Required field holding PENDING, IN_PROGRESS, or COMPLETED
+    @Column(name = "status", nullable = false, length = Integer.MAX_VALUE)
+    private String status;
+
+    // The column is named due_date, the Java field is dueDate, so @Column bridges the two
+    @Column(name = "due_date")
+    private LocalDate dueDate;
+
+    // Getters and setters, used by both JPA and the JSON converter to read and write this object
 
     public Integer getId() {
         return id;
@@ -46,13 +70,12 @@ public class Task {
         this.status = status;
     }
 
-    public String getDueDate() {
+    public LocalDate getDueDate() {
         return dueDate;
     }
 
-    public void setDueDate(String dueDate) {
+    public void setDueDate(LocalDate dueDate) {
         this.dueDate = dueDate;
     }
+
 }
-
-
